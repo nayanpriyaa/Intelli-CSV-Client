@@ -95,26 +95,25 @@ function ChartRenderer({ chart, csvData, onEdit, onDelete }) {
   const data = prepareData();
 
   // Export chart as PNG
-  const handleExportSVG = () => {
-  const svg = chartRef.current?.querySelector('svg');
-  if (!svg) {
-    alert('SVG not found');
-    return;
+  const handleExport = async () => {
+  if (!chartRef.current) return;
+
+  try {
+    const canvas = await html2canvas(chartRef.current, {
+      backgroundColor: '#ffffff',
+      scale: 4,               // 👈 increase scale
+      useCORS: true,
+      logging: false,
+    });
+
+    const link = document.createElement('a');
+    link.download = `${spec.title || 'chart'}.png`;
+    link.href = canvas.toDataURL('image/png', 1.0);
+    link.click();
+  } catch (error) {
+    console.error('Failed to export chart:', error);
+    alert('Failed to export chart');
   }
-
-  const serializer = new XMLSerializer();
-  const source = serializer.serializeToString(svg);
-
-  const blob = new Blob([source], {
-    type: 'image/svg+xml;charset=utf-8',
-  });
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${spec.title || 'chart'}.svg`;
-  link.click();
-  URL.revokeObjectURL(url);
 };
 
 
