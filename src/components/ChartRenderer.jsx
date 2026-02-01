@@ -96,26 +96,23 @@ function ChartRenderer({ chart, csvData, onEdit, onDelete }) {
 
   // Export chart as PNG
   const handleExport = async () => {
-  if (!chartRef.current) return;
+    if (!chartRef.current) return;
 
-  try {
-    const canvas = await html2canvas(chartRef.current, {
-      backgroundColor: '#ffffff',
-      scale: 4,               // 👈 increase scale
-      useCORS: true,
-      logging: false,
-    });
+    try {
+      const canvas = await html2canvas(chartRef.current, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+      });
 
-    const link = document.createElement('a');
-    link.download = `${spec.title || 'chart'}.png`;
-    link.href = canvas.toDataURL('image/png', 1.0);
-    link.click();
-  } catch (error) {
-    console.error('Failed to export chart:', error);
-    alert('Failed to export chart');
-  }
-};
-
+      const link = document.createElement('a');
+      link.download = `${spec.title || 'chart'}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (error) {
+      console.error('Failed to export chart:', error);
+      alert('Failed to export chart');
+    }
+  };
 
   // Render appropriate chart based on type
   const renderChart = () => {
