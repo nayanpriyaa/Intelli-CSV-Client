@@ -1,148 +1,139 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { signup } from '../services/auth';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { signup } from "../services/auth";
 
 function Signup({ onLogin }) {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-    setError('');
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
 
-    // Validation
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError("Password must be at least 6 characters");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await signup(formData.email, formData.password);
-      onLogin(response.user);
-      navigate('/dashboards');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Signup failed. Please try again.');
+      const res = await signup(formData.email, formData.password);
+      onLogin(res.user);
+      navigate("/dashboards");
+    } catch {
+      setError("Signup failed. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 px-4">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg animate-fade-in">
-        <div>
-          <h2 className="text-center text-3xl font-bold text-gray-900">
-            Intelli-CSV
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Create your account
+    <div className="min-h-screen bg-[#0b0b0e] flex items-center justify-center px-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="w-full max-w-md space-y-8"
+      >
+        {/* Heading */}
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Create account
+          </h1>
+          <p className="text-white/50 text-sm">
+            Start building dashboards
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-              {error}
-            </div>
-          )}
+        {/* Error */}
+        {error && (
+          <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/30 px-4 py-2 rounded-lg">
+            {error}
+          </div>
+        )}
 
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="input mt-1"
-                placeholder="you@example.com"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="input mt-1"
-                placeholder="••••••••"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                Must be at least 6 characters
-              </p>
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="input mt-1"
-                placeholder="••••••••"
-              />
-            </div>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="label-dark">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="you@example.com"
+              className="input-dark"
+              required
+            />
           </div>
 
           <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn btn-primary w-full"
-            >
-              {loading ? 'Creating account...' : 'Sign up'}
-            </button>
+            <label className="label-dark">Password</label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              className="input-dark"
+              required
+            />
           </div>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
-                Sign in
-              </Link>
-            </p>
+          <div>
+            <label className="label-dark">Confirm Password</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="••••••••"
+              className="input-dark"
+              required
+            />
           </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="
+              w-full py-3 rounded-xl
+              bg-cyan-500 text-black font-medium
+              hover:bg-cyan-400
+              hover-lift focus-ring
+              disabled:opacity-60
+            "
+          >
+            {loading ? "Creating account..." : "Sign Up"}
+          </button>
         </form>
-      </div>
+
+        {/* Navigation */}
+        <p className="text-sm text-white/50 text-center">
+          Already have an account?{" "}
+          <Link to="/login" className="text-cyan-400 hover:underline">
+            Sign in
+          </Link>
+        </p>
+      </motion.div>
     </div>
   );
 }

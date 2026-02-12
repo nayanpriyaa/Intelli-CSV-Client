@@ -1,26 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import DashboardList from './pages/DashboardList';
-import DashboardEditor from './pages/DashboardEditor';
-import { getCurrentUser } from './services/auth';
+import React, { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import DashboardList from "./pages/DashboardList";
+import DashboardEditor from "./pages/DashboardEditor";
+import { getCurrentUser } from "./services/auth";
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in on app mount
     const checkAuth = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (token) {
         try {
           const userData = await getCurrentUser();
           setUser(userData);
-        } catch (error) {
-          console.error('Auth check failed:', error);
-          localStorage.removeItem('token');
+        } catch {
+          localStorage.removeItem("token");
         }
       }
       setLoading(false);
@@ -34,24 +33,22 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setUser(null);
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
+      <div className="min-h-screen bg-[#0b0b0e] flex items-center justify-center text-white">
+        Loading…
       </div>
     );
   }
 
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
+        {/* AUTH */}
         <Route
           path="/login"
           element={
@@ -64,6 +61,8 @@ function App() {
             user ? <Navigate to="/dashboards" /> : <Signup onLogin={handleLogin} />
           }
         />
+
+        {/* APP */}
         <Route
           path="/dashboards"
           element={
@@ -84,9 +83,11 @@ function App() {
             )
           }
         />
-        <Route path="/" element={<Navigate to="/dashboards" />} />
+
+        {/* DEFAULT */}
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 

@@ -1,22 +1,29 @@
 import React, { useState, useEffect } from 'react';
 
-function AddChartControls({ csvData, onAddChart, editingChart, onUpdateChart, onCancelEdit }) {
+function AddChartControls({
+  csvData,
+  onAddChart,
+  editingChart,
+  onUpdateChart,
+  onCancelEdit,
+}) {
   const [chartType, setChartType] = useState('bar');
   const [xColumn, setXColumn] = useState('');
   const [yColumn, setYColumn] = useState('');
   const [chartTitle, setChartTitle] = useState('');
+  const [chartColor, setChartColor] = useState('#22d3ee');
   const [showForm, setShowForm] = useState(false);
 
-  // Get column names from CSV data
-  const columns = csvData && csvData.length > 0 ? Object.keys(csvData[0]) : [];
+  const columns =
+    csvData && csvData.length > 0 ? Object.keys(csvData[0]) : [];
 
-  // Populate form when editing
   useEffect(() => {
     if (editingChart) {
       setChartType(editingChart.spec.type);
       setXColumn(editingChart.spec.xColumn || '');
       setYColumn(editingChart.spec.yColumn || '');
       setChartTitle(editingChart.spec.title || '');
+      setChartColor(editingChart.spec.color || '#22d3ee');
       setShowForm(true);
     }
   }, [editingChart]);
@@ -33,16 +40,16 @@ function AddChartControls({ csvData, onAddChart, editingChart, onUpdateChart, on
       type: chartType,
       xColumn,
       yColumn: chartType === 'pie' ? xColumn : yColumn,
-      title: chartTitle || `${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`,
+      title:
+        chartTitle ||
+        `${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`,
+      color: chartColor,
     };
 
-    if (editingChart) {
-      onUpdateChart(editingChart.id, chartSpec);
-    } else {
-      onAddChart(chartSpec);
-    }
+    editingChart
+      ? onUpdateChart(editingChart.id, chartSpec)
+      : onAddChart(chartSpec);
 
-    // Reset form
     resetForm();
   };
 
@@ -51,130 +58,144 @@ function AddChartControls({ csvData, onAddChart, editingChart, onUpdateChart, on
     setXColumn('');
     setYColumn('');
     setChartTitle('');
+    setChartColor('#22d3ee');
     setShowForm(false);
   };
 
   const handleCancel = () => {
     resetForm();
-    if (onCancelEdit) {
-      onCancelEdit();
-    }
+    onCancelEdit?.();
   };
 
-  if (!csvData || csvData.length === 0) {
-    return null;
-  }
+  if (!csvData || csvData.length === 0) return null;
 
   return (
-    <div className="card">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">
-          {editingChart ? 'Edit Chart' : 'Add Chart'}
+    <div className="bg-[#0b0b0e] border border-white/10 rounded-2xl p-6 shadow-xl">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-lg font-semibold text-white">
+          {editingChart ? 'Edit Chart' : 'Charts'}
         </h3>
+
         {!showForm && !editingChart && (
-          <button onClick={() => setShowForm(true)} className="btn btn-primary">
+          <button
+            onClick={() => setShowForm(true)}
+            className="px-4 py-2 rounded-lg bg-cyan-500 text-black font-medium 
+           hover:bg-cyan-400 transition 
+           hover-lift focus-ring active:scale-[0.98]"
+
+          >
             + Add Chart
           </button>
         )}
       </div>
 
       {(showForm || editingChart) && (
-        <form onSubmit={handleSubmit} className="space-y-4 animate-slide-up">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-5 animate-fade-in"
+        >
           {/* Chart Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Chart Type
-            </label>
+            <label className="label-dark">Chart Type</label>
             <select
               value={chartType}
               onChange={(e) => setChartType(e.target.value)}
-              className="input"
+              className="input-dark"
             >
-              <option value="bar">Bar Chart</option>
-              <option value="line">Line Chart</option>
-              <option value="area">Area Chart</option>
-              <option value="pie">Pie Chart</option>
-              <option value="scatter">Scatter Plot</option>
+              <option value="bar">Bar</option>
+              <option value="line">Line</option>
+              <option value="area">Area</option>
+              <option value="pie">Pie</option>
+              <option value="scatter">Scatter</option>
               <option value="histogram">Histogram</option>
               <option value="treemap">Treemap</option>
             </select>
           </div>
 
-          {/* Chart Title */}
+          {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Chart Title (Optional)
-            </label>
+            <label className="label-dark">Chart Title</label>
             <input
               type="text"
               value={chartTitle}
               onChange={(e) => setChartTitle(e.target.value)}
-              className="input"
-              placeholder="Enter chart title"
+              placeholder="Optional title"
+              className="input-dark"
+            />
+          </div>
+
+          {/* Color */}
+          <div className="flex items-center gap-4">
+            <label className="label-dark">Accent Color</label>
+            <input
+              type="color"
+              value={chartColor}
+              onChange={(e) => setChartColor(e.target.value)}
+              className="w-12 h-10 rounded border border-white/20 bg-transparent"
             />
           </div>
 
           {/* X Column */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {chartType === 'pie' ? 'Category Column' : 'X-Axis Column'}
+            <label className="label-dark">
+              {chartType === 'pie' ? 'Category Column' : 'X Axis'}
             </label>
             <select
               value={xColumn}
               onChange={(e) => setXColumn(e.target.value)}
-              className="input"
+              className="input-dark"
               required
             >
-              <option value="">Select column...</option>
+              <option value="">Select column</option>
               {columns.map((col) => (
-                <option key={col} value={col}>
-                  {col}
-                </option>
+                <option key={col}>{col}</option>
               ))}
             </select>
           </div>
 
-          {/* Y Column (not needed for pie charts) */}
+          {/* Y Column */}
           {chartType !== 'pie' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Y-Axis Column
-              </label>
+              <label className="label-dark">Y Axis</label>
               <select
                 value={yColumn}
                 onChange={(e) => setYColumn(e.target.value)}
-                className="input"
+                className="input-dark"
                 required
               >
-                <option value="">Select column...</option>
+                <option value="">Select column</option>
                 {columns.map((col) => (
-                  <option key={col} value={col}>
-                    {col}
-                  </option>
+                  <option key={col}>{col}</option>
                 ))}
               </select>
             </div>
           )}
 
-          {/* Chart Type Hints */}
-          <div className="bg-blue-50 p-3 rounded-lg">
-            <p className="text-xs text-blue-800">
-              {chartType === 'bar' && '📊 Bar Chart: Compare values across categories'}
-              {chartType === 'line' && '📈 Line Chart: Show trends over time or sequence'}
-              {chartType === 'area' && '📉 Area Chart: Display cumulative values over time'}
-              {chartType === 'pie' && '🥧 Pie Chart: Show proportions of a whole'}
-              {chartType === 'scatter' && '⚫ Scatter Plot: Show relationship between two variables'}
-              {chartType === 'histogram' && '📊 Histogram: Display distribution of values'}
-              {chartType === 'treemap' && '🗂️ Treemap: Show hierarchical data as nested rectangles'}
-            </p>
+          {/* Hint */}
+          <div className="text-xs text-white/60 bg-white/5 p-3 rounded-lg">
+            {chartType === 'bar' && 'Compare values across categories'}
+            {chartType === 'line' && 'Visualize trends over time'}
+            {chartType === 'area' && 'Cumulative progression'}
+            {chartType === 'pie' && 'Proportional distribution'}
+            {chartType === 'scatter' && 'Relationship between variables'}
+            {chartType === 'histogram' && 'Data distribution'}
+            {chartType === 'treemap' && 'Hierarchical representation'}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex space-x-3">
-            <button type="submit" className="btn btn-primary">
-              {editingChart ? 'Update Chart' : 'Add Chart to Dashboard'}
+          {/* Actions */}
+          <div className="flex gap-3 pt-2">
+            <button
+              type="submit"
+              className="px-5 py-2 rounded-lg bg-cyan-500 text-black font-medium hover:bg-cyan-400 transition"
+            >
+              {editingChart ? 'Update Chart' : 'Add to Dashboard'}
             </button>
-            <button type="button" onClick={handleCancel} className="btn btn-secondary">
+
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="px-5 py-2 rounded-lg border border-white/20 text-white/70 hover:bg-white/10 transition"
+            >
               Cancel
             </button>
           </div>

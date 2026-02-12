@@ -8,17 +8,21 @@ function DataAnalyzer({ data }) {
     const rowCount = data.length;
     const columnCount = headers.length;
 
-    // Analyze column types
     const columnTypes = {};
     const columnStats = {};
 
     headers.forEach((header) => {
-      const values = data.map((row) => row[header]).filter((v) => v !== null && v !== undefined && v !== '');
-      const numericValues = values.filter((v) => typeof v === 'number' || !isNaN(Number(v)));
+      const values = data
+        .map((row) => row[header])
+        .filter((v) => v !== null && v !== undefined && v !== '');
+
+      const numericValues = values.filter(
+        (v) => typeof v === 'number' || !isNaN(Number(v))
+      );
 
       if (numericValues.length > values.length * 0.8) {
-        columnTypes[header] = 'numeric';
         const numbers = numericValues.map(Number);
+        columnTypes[header] = 'numeric';
         columnStats[header] = {
           min: Math.min(...numbers),
           max: Math.max(...numbers),
@@ -37,84 +41,106 @@ function DataAnalyzer({ data }) {
       columnCount,
       headers,
       columnTypes,
-      columnStats,};
+      columnStats,
+    };
   }, [data]);
 
   if (!analysis) return null;
 
   return (
-    <div className="card">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Data Analysis</h3>
-      
-      {/* Summary Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-primary-50 p-4 rounded-lg">
-          <p className="text-sm text-primary-600 font-medium">Rows</p>
-          <p className="text-2xl font-bold text-primary-900">{analysis.rowCount}</p>
-        </div>
-        <div className="bg-green-50 p-4 rounded-lg">
-          <p className="text-sm text-green-600 font-medium">Columns</p>
-          <p className="text-2xl font-bold text-green-900">{analysis.columnCount}</p>
-        </div>
-        <div className="bg-purple-50 p-4 rounded-lg">
-          <p className="text-sm text-purple-600 font-medium">Numeric</p>
-          <p className="text-2xl font-bold text-purple-900">
-            {Object.values(analysis.columnTypes).filter((t) => t === 'numeric').length}
-          </p>
-        </div>
-        <div className="bg-orange-50 p-4 rounded-lg">
-          <p className="text-sm text-orange-600 font-medium">Text</p>
-          <p className="text-2xl font-bold text-orange-900">
-            {Object.values(analysis.columnTypes).filter((t) => t === 'text').length}
-          </p>
-        </div>
+    <div className="bg-[#0b0b0e] border border-white/10 rounded-2xl p-5 space-y-6">
+      {/* Header */}
+      <h3 className="text-white font-medium text-lg">
+        Dataset Overview
+      </h3>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatCard label="Rows" value={analysis.rowCount} />
+        <StatCard label="Columns" value={analysis.columnCount} />
+        <StatCard
+          label="Numeric"
+          value={
+            Object.values(analysis.columnTypes).filter(
+              (t) => t === 'numeric'
+            ).length
+          }
+          accent="cyan"
+        />
+        <StatCard
+          label="Text"
+          value={
+            Object.values(analysis.columnTypes).filter(
+              (t) => t === 'text'
+            ).length
+          }
+          accent="orange"
+        />
       </div>
 
       {/* Column Details */}
       <div>
-        <h4 className="text-sm font-semibold text-gray-700 mb-3">Column Details</h4>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <h4 className="text-sm font-medium text-white/70 mb-3">
+          Column Details
+        </h4>
+
+        <div className="overflow-x-auto rounded-xl border border-white/10">
+          <table className="min-w-full text-sm">
+            <thead className="bg-white/5">
               <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-2 text-left text-white/60">
                   Column
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-2 text-left text-white/60">
                   Type
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-2 text-left text-white/60">
                   Statistics
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+
+            <tbody className="divide-y divide-white/10">
               {analysis.headers.map((header) => (
-                <tr key={header}>
-                  <td className="px-4 py-2 text-sm font-medium text-gray-900">{header}</td>
-                  <td className="px-4 py-2 text-sm text-gray-600">
+                <tr key={header} className="hover:bg-white/5 transition">
+                  <td className="px-4 py-2 text-white">
+                    {header}
+                  </td>
+
+                  <td className="px-4 py-2">
                     <span
-                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      className={`px-2 py-1 rounded-full text-xs ${
                         analysis.columnTypes[header] === 'numeric'
-                          ? 'bg-purple-100 text-purple-800'
-                          : 'bg-orange-100 text-orange-800'
+                          ? 'bg-cyan-500/20 text-cyan-400'
+                          : 'bg-orange-500/20 text-orange-400'
                       }`}
                     >
                       {analysis.columnTypes[header]}
                     </span>
                   </td>
-                  <td className="px-4 py-2 text-sm text-gray-600">
+
+                  <td className="px-4 py-2 text-white/70">
                     {analysis.columnTypes[header] === 'numeric' ? (
-                      <div className="text-xs">
-                        <span>Min: {analysis.columnStats[header].min.toFixed(2)}</span>
-                        <span className="mx-2">|</span>
-                        <span>Max: {analysis.columnStats[header].max.toFixed(2)}</span>
-                        <span className="mx-2">|</span>
-                        <span>Avg: {analysis.columnStats[header].avg.toFixed(2)}</span>
+                      <div className="text-xs space-x-2">
+                        <span>
+                          Min:{' '}
+                          {analysis.columnStats[header].min.toFixed(2)}
+                        </span>
+                        <span>•</span>
+                        <span>
+                          Max:{' '}
+                          {analysis.columnStats[header].max.toFixed(2)}
+                        </span>
+                        <span>•</span>
+                        <span>
+                          Avg:{' '}
+                          {analysis.columnStats[header].avg.toFixed(2)}
+                        </span>
                       </div>
                     ) : (
                       <div className="text-xs">
-                        {analysis.columnStats[header].unique} unique values
+                        {analysis.columnStats[header].unique} unique
+                        values
                       </div>
                     )}
                   </td>
@@ -124,6 +150,25 @@ function DataAnalyzer({ data }) {
           </table>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ---------- Small Stat Card ---------- */
+
+function StatCard({ label, value, accent = 'default' }) {
+  const accentMap = {
+    default: 'text-white',
+    cyan: 'text-cyan-400',
+    orange: 'text-orange-400',
+  };
+
+  return (
+    <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+      <p className="text-xs text-white/60 mb-1">{label}</p>
+      <p className={`text-2xl font-semibold ${accentMap[accent]}`}>
+        {value}
+      </p>
     </div>
   );
 }

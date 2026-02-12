@@ -2,86 +2,183 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Clash Display";
+  src: url("./assets/fonts/ClashDisplay-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Clash Display";
+  src: url("./assets/fonts/ClashDisplay-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Clash Display";
+  src: url("./assets/fonts/ClashDisplay-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    font-family: "Clash Display", system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", sans-serif;
+    @apply bg-[#0b0b0e] text-white antialiased;
   }
 }
 
+@layer base {
+  h1, h2, h3, h4 {
+    font-family: "Clash Display", sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+
+
+/* ---------------- COMPONENTS ---------------- */
 @layer components {
+  /* Buttons */
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply px-4 py-2 rounded-lg font-medium transition focus:outline-none;
   }
 
   .btn-primary {
-    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    @apply bg-cyan-500 text-black hover:bg-cyan-400;
   }
 
   .btn-secondary {
-    @apply bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-500;
+    @apply border border-white/20 text-white/70 hover:bg-white/10;
   }
 
   .btn-danger {
-    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+    @apply bg-red-600 text-white hover:bg-red-500;
   }
 
-  .input {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  /* DARK INPUTS (THIS FIXES THE ISSUE) */
+  .input-dark {
+    @apply w-full bg-[#111116] text-white border border-white/15 rounded-lg px-3 py-2 text-sm outline-none transition;
   }
 
+  .input-dark::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .input-dark:focus {
+    @apply border-cyan-400;
+    box-shadow: 0 0 0 1px #22d3ee;
+  }
+
+  /* FIX SELECT DROPDOWNS */
+  select.input-dark {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+    padding-right: 2.5rem;
+  }
+
+  /* Cards */
   .card {
-    @apply bg-white rounded-lg shadow-md p-6;
+    @apply bg-[#0b0b0e] border border-white/10 rounded-2xl p-6;
   }
 
   .card-hover {
-    @apply bg-white rounded-lg shadow-md p-6 transition-shadow duration-200 hover:shadow-lg cursor-pointer;
+    @apply bg-[#0b0b0e] border border-white/10 rounded-2xl p-6 transition hover:border-cyan-400/50 cursor-pointer;
+  }
+
+  /* Labels */
+  .label-dark {
+    @apply block text-sm text-white/70 mb-1;
+  }
+
+  /* Icon buttons */
+  .icon-btn {
+    @apply text-xs px-2 py-1 rounded-md border border-white/20 text-white/70 hover:bg-white/10 transition;
+  }
+
+  .icon-btn.danger {
+    @apply hover:bg-red-500/20 hover:text-red-400;
   }
 }
 
-/* Custom scrollbar */
+/* ---------------- ANIMATIONS ---------------- */
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------------- SCROLLBAR ---------------- */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #0b0b0e;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: #2a2a2f;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #3a3a40;
 }
 
-/* Animation utilities */
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-in;
+/* ---------------- PREMIUM MICRO-INTERACTIONS ---------------- */
+.hover-lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.animate-slide-up {
-  animation: slideUp 0.3s ease-out;
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.focus-ring {
+  outline: none;
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateY(10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.focus-ring:focus-visible {
+  box-shadow: 0 0 0 2px #06b6d4;
+}
+
+.glow-cyan {
+  box-shadow: 0 0 40px rgba(6, 182, 212, 0.15);
 }
